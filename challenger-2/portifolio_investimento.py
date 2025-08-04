@@ -6,10 +6,6 @@ import matplotlib.pyplot as plt
 import random
 
 
-# ========================
-# Funções do Algoritmo
-# ========================
-
 def obter_retorno_e_cov(acoes, periodo="1y"):
     dados = yf.download(acoes, period=periodo, auto_adjust=True)['Close']
     retornos = np.log(dados / dados.shift(1)).dropna()
@@ -18,18 +14,20 @@ def obter_retorno_e_cov(acoes, periodo="1y"):
     return retorno_esperado, covariancia
 
 
-def calcular_fitness(pesos, mu, sigma, lambda_risco):
-    retorno = np.dot(mu, pesos)
-    risco = np.sqrt(np.dot(pesos.T, np.dot(sigma, pesos)))
-    return retorno - lambda_risco * risco
-
-
 def criar_individuo(n):
+    # GENOMA
+    # [0.2, 0.3, 0.1, 0.4]
     return np.random.dirichlet(np.ones(n))
 
 
-def criar_populacao(tamanho, n_acoes):
-    return [criar_individuo(n_acoes) for _ in range(tamanho)]
+def calcular_fitness(pesos, mu, sigma, lambda_risco):
+    # pesos: vetor com as proporções de alocação em cada ativo (soma = 1).
+    # mu: vetor de retornos médios esperados de cada ativo.
+    # sigma: matriz de covariância dos retornos dos ativos (mede risco conjunto).
+    # lambda_risco: parâmetro de penalização do risco (trade-off entre retorno e risco)
+    retorno = np.dot(mu, pesos)
+    risco = np.sqrt(np.dot(pesos.T, np.dot(sigma, pesos)))
+    return retorno - lambda_risco * risco
 
 
 def selecionar_pais(populacao, fitness, k=3):
@@ -41,6 +39,10 @@ def crossover(pai1, pai2):
     alpha = np.random.rand()
     filho = alpha * pai1 + (1 - alpha) * pai2
     return filho / np.sum(filho)  # Normaliza para manter soma 1
+
+
+def criar_populacao(tamanho, n_acoes):
+    return [criar_individuo(n_acoes) for _ in range(tamanho)]
 
 
 def mutar(individuo, taxa=0.1):
@@ -61,7 +63,7 @@ def algoritmo_genetico(mu, sigma, lambda_risco, geracoes=200, pop_tam=50, taxa_m
     populacao = criar_populacao(pop_tam, n)
     melhor_fitness_historico = -np.inf
     geracoes_sem_melhora = 0
-    limite_estagnacao = 50  # Novo parâmetro de critério de parada
+    limite_estagnacao = 400
 
     for gen in range(geracoes):
         fitness = [calcular_fitness(ind, mu, sigma, lambda_risco) for ind in populacao]
@@ -76,7 +78,7 @@ def algoritmo_genetico(mu, sigma, lambda_risco, geracoes=200, pop_tam=50, taxa_m
 
         # Parar por estagnação
         if geracoes_sem_melhora >= limite_estagnacao:
-            print(f"Parando por estagnação após {gen + 1} gerações.")
+            print(f"Parando por estagnação após {gen + 1} gerações..")
             break
 
         num_elite = int(elitismo * pop_tam)
@@ -107,12 +109,14 @@ def algoritmo_genetico(mu, sigma, lambda_risco, geracoes=200, pop_tam=50, taxa_m
 
 st.title("🧬 Otimização de Portfólio com Algoritmo Genético.")
 
-lista_acoes = ['PETR4.SA', 'VALE3.SA', 'ITUB4.SA', 'WEGE3.SA', 'ABEV3.SA', 'BBDC4.SA', 'JBSS3.SA']
+lista_acoes = ['PETR4.SA', 'VALE3.SA', 'ITUB4.SA', 'WEGE3.SA', 'ABEV3.SA', 'BBDC4.SA', 'JBSS3.SA',
+               'GOLL54.SA', 'BBAS3.SA', 'MGLU3.SA', 'B3SA3.SA', 'GGBR4.SA', 'WEGE3.SA', 'EMBR3.SA',
+               'RENT3.SA', 'CYRE3.SA', 'SMFT3.SA', 'BPAC11.SA', 'PSSA3.SA']
 acoes_selecionadas = st.multiselect("Selecione as ações para o portfólio:", lista_acoes,
                                     default=['ABEV3.SA', 'BBDC4.SA'])
 
-lambda_risco = st.slider("Aversão ao risco (λ)", 0.0, 2.0, 0.5, step=0.1)
-geracoes = st.slider("Nº de gerações", 10, 500, 200, step=10)
+lambda_risco = st.slider("Aversão ao risco (λ)", 0.0, 2.0, 0.2, step=0.1)
+geracoes = st.slider("Nº de gerações", 10, 2500, 500, step=10)
 pop_tam = st.slider("Tamanho da população", 10, 200, 50, step=10)
 taxa_mutacao = st.slider("Taxa de mutação", 0.0, 1.0, 0.1, step=0.05)
 elitismo = st.slider("Porcentagem de elitismo", 0.0, 1.0, 0.1, step=0.05)
@@ -132,6 +136,7 @@ if st.button("Rodar Otimização"):
         "Peso (%)": np.round(solucao * 100, 2)
     })
     st.dataframe(resultado)
+    st.markdown(f"**📈 Soma investimento:** {np.sum(solucao):.2%}")
 
     st.markdown(f"**📈 Retorno Esperado:** {retorno:.2%}")
     st.markdown(f"**📉 Risco (Volatilidade):** {risco:.2%}")
@@ -143,16 +148,3 @@ if st.button("Rodar Otimização"):
     ax.set_xlabel("Geração")
     ax.set_ylabel("Fitness")
     st.pyplot(fig)
-
-    import pandas as pd
-
-    # Certifica que o índice 'Geração' é inteiro
-    df_historico = pd.DataFrame({
-        "Geração": list(range(len(historico))),  # Garante números inteiros
-        "Fitness": historico  # Pode conter valores negativos
-    }).astype({"Geração": int}).set_index("Geração")
-
-    st.subheader("📈 Evolução do Fitness")
-    st.line_chart(df_historico)
-
-
