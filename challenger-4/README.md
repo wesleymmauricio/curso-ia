@@ -116,6 +116,8 @@ O vídeo de domonstração também está disponível no OneDrive:
 
 https://1drv.ms/v/c/ff7c96d3b1848b0a/IQA7_ZoLWj3zSYob-sYmMDcDAcqYSThaTl2dBwZspPyPR_M?e=AqV2sX
 
+Além do video, também disponibilizamos o resumo gerado durante os testes resumo_analise.txt
+
 ---
 
 
