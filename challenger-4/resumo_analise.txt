@@ -1,0 +1,7 @@
+=== RESUMO AUTOMÁTICO DE ANÁLISE DE VÍDEO ===
+Total de frames analisados: 3326
+Total de pessoas únicas identificadas: 28
+Atividades principais observadas: Anomalia, Analisando, Careta, Deitado, Trabalho (Laptop), Sorrindo, Acenando, Em repouso, Maos no Rosto, Dancando, Realizando Procedimento, Lendo
+Emoções detectadas: happy, angry, surprise, neutral, sad, fear
+Número de anomalias detectadas: 338
+============================================
