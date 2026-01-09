@@ -81,6 +81,7 @@ Execute os comandos abaixo no Colab:
 ```bash
 !pip uninstall -y mediapipe
 !pip install --no-cache-dir mediapipe==0.10.14 deepface ultralytics
+```
 
 ### 4️⃣ Execução do Código
 
