@@ -1,5 +1,0 @@
-=== RESUMO AUTOMÁTICO DE ANÁLISE DE VÍDEO ===
-Total de pessoas únicas identificadas: 28
-Atividades principais observadas: Trabalho (Laptop), Careta, Sorrindo, Acenando, Maos no Rosto, Lendo, Realizando Procedimento, Analisando, Anomalia, Deitado, Em repouso, Dancando
-Emoções detectadas: fear, sad, angry, neutral, happy, surprise
-============================================
